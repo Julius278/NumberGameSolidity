@@ -165,7 +165,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<packageName>com.julius.spring.boot.ethweb3</packageName>
+					<packageName>com.julius.web3.contracts</packageName>
 					<sourceDestination>${basedir}/target/generated-sources/contracts</sourceDestination>
 					<abiSourceFiles>
 						<directory>${basedir}/src/main/resources/abi</directory>

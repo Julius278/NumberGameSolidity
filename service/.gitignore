@@ -64,3 +64,5 @@ buildNumber.properties
 .idea/dataSources.local.xml
 /mvnw.cmd
 /mvnw
+/src/main/resources/artifacts/
+/src/main/resources/cache/
