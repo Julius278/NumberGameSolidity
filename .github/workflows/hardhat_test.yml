@@ -18,7 +18,7 @@ jobs:
       with:
         node-version: '18'
     - name: go to service directory
-      run: cd service
+      run: cd service && npx hardhat test
     - name: show working directory
       run: pwd
     - name: test with hardhat
