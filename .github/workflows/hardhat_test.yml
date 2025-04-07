@@ -17,9 +17,12 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-    - name: go to service directory
-      run: cd service && npx hardhat test
+    - name: npm install
+      run: npm install
+      working-directory: ./service
     - name: show working directory
       run: pwd
+      working-directory: ./service
     - name: test with hardhat
       run: npx hardhat test
+      working-directory: ./service
