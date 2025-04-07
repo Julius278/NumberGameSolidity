@@ -1,4 +1,4 @@
-name: Java CI with Maven
+name: Node - hardhat test
 
 on:
   push:
@@ -19,5 +19,7 @@ jobs:
         node-version: '18'
     - name: go to service directory
       run: cd service
+    - name: show working directory
+      run: pwd
     - name: test with hardhat
       run: npx hardhat test
