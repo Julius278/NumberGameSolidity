@@ -17,7 +17,7 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-    - name: npm install
+    - name: install dependencies
       run: npm install
       working-directory: ./service
     - name: show working directory
