@@ -161,7 +161,7 @@ contract ManagedGame {
         return (winnerList[0], winnerBetList[0]);
     }
 
-    function getRandomWinner(address payable[] memory _winnerList, uint16[] memory _winnerBetList) internal returns (address payable, uint16) {
+    function getRandomWinner(address payable[] memory _winnerList, uint16[] memory _winnerBetList) internal view returns (address payable, uint16) {
         uint256 hash = uint256(keccak256(abi.encodePacked(_winnerList, _winnerBetList, block.number, block.timestamp)));
         uint256 m = hash % _winnerList.length;
         return (_winnerList[m], _winnerBetList[m]);
