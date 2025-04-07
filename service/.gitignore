@@ -52,12 +52,15 @@ buildNumber.properties
 .mvn/timing.properties
 # https://github.com/takari/maven-wrapper#usage-without-binary-jar
 .mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
 
 # Default ignored files
-.idea//shelf/
+.idea/shelf/
 .idea/workspace.xml
 # Editor-based HTTP Client requests
 .idea/httpRequests/
 # Datasource local storage ignored files
 .idea/dataSources/
 .idea/dataSources.local.xml
+/mvnw.cmd
+/mvnw
