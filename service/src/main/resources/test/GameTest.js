@@ -3,57 +3,6 @@ const {expect} = require("chai");
 
 const forge = require('node-forge');
 
-/*const EthCrypto = require('eth-crypto');
-
-async function decryptMessage(encryptedMessage, gameManagerCrypt, signaturePublicKey) {
-    const encryptedObject = EthCrypto.cipher.parse(encryptedMessage);
-
-    const decrypted = await EthCrypto.decryptWithPrivateKey(
-        gameManagerCrypt.privateKey,
-        encryptedObject
-    );
-    const decryptedPayload = JSON.parse(decrypted);
-
-    const senderAddress = EthCrypto.recover(
-        decryptedPayload.signature,
-        EthCrypto.hash.keccak256(decryptedPayload.message)
-    );
-    console.log(
-        'Got message from ' +
-        senderAddress +
-        ': ' +
-        decryptedPayload.message
-    );
-
-    const pub = EthCrypto.recoverPublicKey(
-        decryptedPayload.signature, // signature
-        EthCrypto.hash.keccak256(decryptedPayload.message.toString()) // message hash
-    );
-
-    console.log("recovered public key: %s", pub);
-    expect(signaturePublicKey).to.equal(pub);
-
-    return decryptedPayload.message;
-}
-
-async function encryptChosenNumber(player1Crypt, secretMessage, managerPublicKey) {
-    const signature = EthCrypto.sign(
-        player1Crypt.privateKey,
-        EthCrypto.hash.keccak256(secretMessage.toString())
-    );
-    console.log("created signature: %s", signature);
-    const payload = {
-        message: secretMessage,
-        signature
-    };
-    const encrypted = await EthCrypto.encryptWithPublicKey(
-        managerPublicKey,
-        JSON.stringify(payload)
-    );
-
-    return EthCrypto.cipher.stringify(encrypted);
-}*/
-
 function encryptMessage(publicKey, message) {
     const publicKeyForge = forge.pki.publicKeyFromPem(base64ToPemKey(publicKey));
     const encrypted = publicKeyForge.encrypt(forge.util.encodeUtf8(message));
@@ -79,48 +28,19 @@ function base64ToPemKey(base64String) {
 describe("Game Test", () => {
 
     let factory, game;
-    let gameManager, player1, player2, player3, fund;
-    let gameManagerCrypt, player1Crypt, player2Crypt, player3Crypt;
+    let gameManager, player1, player2, player3;
     let GameContract, GameFactoryContract;
 
     const { privateKey, publicKey } = forge.pki.rsa.generateKeyPair(2048);
 
     before(async () => {
         //create funded signer to fund individual addresses
-        const [fund, _gameManager, _player1, _player2, _player3] = await ethers.getSigners();
-
-        //create all identities
-       /* gameManagerCrypt = EthCrypto.createIdentity();
-        gameManager = new ethers.Wallet(gameManagerCrypt.privateKey, ethers.provider);
-        player1Crypt = EthCrypto.createIdentity();
-        player1 = new ethers.Wallet(player1Crypt.privateKey, ethers.provider);
-        player2Crypt = EthCrypto.createIdentity();
-        player2 = new ethers.Wallet(player2Crypt.privateKey, ethers.provider);
-        player3Crypt = EthCrypto.createIdentity();
-        player3 = new ethers.Wallet(player3Crypt.privateKey, ethers.provider);*/
+        const [_gameManager, _player1, _player2, _player3] = await ethers.getSigners();
 
         gameManager = _gameManager;
         player1 = _player1;
         player2 = _player2;
         player3 = _player3;
-
-        //fund accounts with eth for transaction fees
-       /* await fund.sendTransaction({
-            to: gameManager.address,
-            value: ethers.utils.parseUnits('5', 'ether'),
-        });
-        await fund.sendTransaction({
-            to: player1.address,
-            value: ethers.utils.parseUnits('5', 'ether'),
-        });
-        await fund.sendTransaction({
-            to: player2.address,
-            value: ethers.utils.parseUnits('5', 'ether'),
-        });
-        await fund.sendTransaction({
-            to: player3.address,
-            value: ethers.utils.parseUnits('5', 'ether'),
-        });*/
 
         //init contract factories
         GameFactoryContract = await ethers.getContractFactory("GameFactory");
@@ -156,9 +76,7 @@ describe("Game Test", () => {
 
         let managerPublicKey = await game.connect(player1).getManagerPublicKey();
 
-        //const encryptedNumberString = await encryptChosenNumber(player1Crypt, chosenNumber, managerPublicKey);
         const encryptedNumberString = encryptMessage(managerPublicKey, chosenNumber);
-        //console.log("encrypted with forge: %s", eN)
 
         const options = {value: ethers.utils.parseEther("0.000000001")}
         await game.connect(player1).bet(encryptedNumberString, options);
@@ -199,7 +117,6 @@ describe("Game Test", () => {
 
         let managerPublicKey = await game.connect(player3).getManagerPublicKey();
 
-        //const encryptedNumberString = await encryptChosenNumber(player3Crypt, chosenNumber, managerPublicKey);
         const encryptedNumberString = encryptMessage(managerPublicKey, chosenNumber);
 
         const options = {value: ethers.utils.parseEther("0.000000001")}
@@ -222,6 +139,16 @@ describe("Game Test", () => {
         await expect(call).to.be.revertedWith("Caller is not manager");
     });
 
+    it("gameManager tries to end the game without calling beginEvaluation", async () => {
+        let bets = await game.connect(gameManager).getBets();
+
+        let playerAddresses = [bets[0].voter, bets[1].voter, bets[2].voter];
+        let values = [900, 900, 600];
+
+        let call = game.connect(gameManager).endGame(playerAddresses, values);
+        await expect(call).to.be.revertedWith("Game not in EvaluationPhase");
+    });
+
     it("gameManager begins the evaluation phase of the game", async () => {
         let privKey = keyToBase64String(forge.pki.privateKeyToPem(privateKey));
         await game.connect(gameManager).beginEvaluation(privKey, "any message to explain the evaluation, maybe include the private key");
@@ -232,13 +159,10 @@ describe("Game Test", () => {
         let privKey = keyToBase64String(forge.pki.privateKeyToPem(privateKey));
 
         console.log("decrypt first encryptedNumber: %s", bets[0].encryptedNumber)
-        //const decryptedPlayer1 = await decryptMessage(bets[0].encryptedNumber, gameManagerCrypt, player1Crypt.publicKey);
         const decryptedPlayer1 = Number(await decryptMessage(privKey, bets[0].encryptedNumber));
         expect(decryptedPlayer1).to.be.lt(1000);
-        //const decryptedPlayer2 = await decryptMessage(bets[1].encryptedNumber, gameManagerCrypt, player2Crypt.publicKey);
         const decryptedPlayer2 = Number(await decryptMessage(privKey, bets[1].encryptedNumber));
         expect(decryptedPlayer2).to.be.lt(1000);
-        //const decryptedPlayer3 = await decryptMessage(bets[2].encryptedNumber, gameManagerCrypt, player3Crypt.publicKey);
         const decryptedPlayer3 = Number(await decryptMessage(privKey, bets[2].encryptedNumber));
         expect(decryptedPlayer3).to.be.lt(1000);
 
