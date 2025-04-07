@@ -24,8 +24,10 @@ contract ManagedGame {
 
     address private manager;
     string private managerPublicKey;
-    address payable[] private winner;
-    uint16[] private winnerBet;
+    address payable[] private winnerList;
+    address payable private winner;
+    uint16[] private winnerBetList;
+    uint16 private winnerBet;
     uint private managerFee;
     uint private winnerPrize;
     Bet[] private bets;
@@ -99,14 +101,12 @@ contract ManagedGame {
         (winner, winnerBet) = determineWinner();
 
         managerFee = (getBalance() * 10) / 100;
-        winnerPrize = (getBalance() * 90) / 100 / winner.length;
-        console.log("number of winners: %s, so the winnerPrize is: %s", winner.length, winnerPrize);
+        winnerPrize = (getBalance() * 90) / 100;
+        console.log("number of winners: %s, so the winnerPrize is: %s", winner, winnerPrize);
 
-        for (uint i = 0; i < winner.length; i++) {
-            console.log("transferring winnerPrize '%s' to '%s'", winnerPrize, winner[i]);
-            winner[i].transfer(winnerPrize);
-            emit WinnerAnnouncement(winner[i], winnerPrize, winnerBet[i]);
-        }
+        console.log("transferring winnerPrize '%s' to '%s'", winnerPrize, winner);
+        winner.transfer(winnerPrize);
+        emit WinnerAnnouncement(winner, winnerPrize, winnerBet);
 
         console.log("transferring managerFee '%s' to manager '%s'", managerFee, manager);
         payable(manager).transfer(managerFee);
@@ -114,7 +114,7 @@ contract ManagedGame {
         gameState = GameState.Ended;
     }
 
-    function determineWinner() internal evaluationPhase returns (address payable[] memory, uint16[] memory) {
+    function determineWinner() internal evaluationPhase returns (address payable, uint16) {
         console.log("determineWinner - by players average number");
 
         uint sum = 0;
@@ -135,34 +135,46 @@ contract ManagedGame {
             }
             if (i == 0) {
                 lowestDiff = uint(diff);
-                winner.push(bets[i].voter);
-                winnerBet.push(bets[i].decryptedChosenNumber);
+                winnerList.push(bets[i].voter);
+                winnerBetList.push(bets[i].decryptedChosenNumber);
                 console.log("first checked bet is: '%s' from '%s', with a diff of '%s'", bets[i].decryptedChosenNumber, bets[i].voter, lowestDiff);
             } else {
                 console.log("next checked bet is: '%s' from '%s', with a diff of '%s'", bets[i].decryptedChosenNumber, bets[i].voter, uint(diff));
                 if (lowestDiff > uint(diff)) {
-                    delete winner;
-                    delete winnerBet;
+                    delete winnerList;
+                    delete winnerBetList;
                     console.log("old lowestDiff is: %s, new one is: %s, emptied winner and winnerBet arrays", lowestDiff, uint(diff));
                     lowestDiff = uint(diff);
-                    winner.push(bets[i].voter);
-                    winnerBet.push(bets[i].decryptedChosenNumber);
+                    winnerList.push(bets[i].voter);
+                    winnerBetList.push(bets[i].decryptedChosenNumber);
                 } else if (lowestDiff == uint(diff)) { //if diff is same, push
                     console.log("same lowestDiff: %s as the current winner, push the new winner additionally to the winner array: '%s'", uint(diff), bets[i].voter);
 
-                    winner.push(bets[i].voter);
-                    winnerBet.push(bets[i].decryptedChosenNumber);
+                    winnerList.push(bets[i].voter);
+                    winnerBetList.push(bets[i].decryptedChosenNumber);
                 }
             }
         }
-        return (winner, winnerBet);
+        if(winnerList.length > 1){
+            return getRandomWinner(winnerList, winnerBetList);
+        }
+        return (winnerList[0], winnerBetList[0]);
+    }
+
+    //TODO: implement randomness
+    function getRandomWinner(address payable[] memory _winnerList, uint16[] memory _winnerBetList) internal returns (address payable, uint16) {
+        return (_winnerList[0], _winnerBetList[0]);
     }
 
     function getBalance() public view returns (uint){
         return address(this).balance;
     }
 
-    function getWinner() public view gameEnded returns (address payable[] memory){
+    function getWinnerList() public view gameEnded returns (address payable[] memory){
+        return winnerList;
+    }
+
+    function getWinner() public view gameEnded returns (address payable){
         return winner;
     }
 
