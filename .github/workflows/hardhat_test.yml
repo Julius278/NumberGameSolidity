@@ -13,9 +13,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up JDK 21
+    - name: Set up Node v18
       uses: actions/setup-node@v4
       with:
         node-version: '18'
+    - name: go to service directory
+      run: cd service
     - name: test with hardhat
       run: npx hardhat test
