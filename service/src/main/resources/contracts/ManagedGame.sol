@@ -161,9 +161,10 @@ contract ManagedGame {
         return (winnerList[0], winnerBetList[0]);
     }
 
-    //TODO: implement randomness
     function getRandomWinner(address payable[] memory _winnerList, uint16[] memory _winnerBetList) internal returns (address payable, uint16) {
-        return (_winnerList[0], _winnerBetList[0]);
+        uint256 hash = uint256(keccak256(abi.encodePacked(_winnerList, _winnerBetList, block.number, block.timestamp)));
+        uint256 m = hash % _winnerList.length;
+        return (_winnerList[m], _winnerBetList[m]);
     }
 
     function getBalance() public view returns (uint){
