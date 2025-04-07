@@ -31,7 +31,7 @@ function App() {
 
   const [selectedWallet, setSelectedWallet] = useState<EIP6963ProviderDetail>()
 
-  const [factoryAddress, setFactoryAddress] = useState<string>("0xc3bebaef6394f5a524d33da7305082492648d958");//0xaf560b752f3b2278f67dffa2f8d15e45c9bb7cc9");
+  const factoryAddress = "0xc3bebaef6394f5a524d33da7305082492648d958";
 
   const providers = useSyncProviders();
   const [userAccount, setUserAccount] = useState<string>("");
@@ -263,6 +263,8 @@ function App() {
     if (reason === 'clickaway') {
       return;
     }
+
+    console.log(event?.eventPhase);
 
     setOpen(false);
   };
