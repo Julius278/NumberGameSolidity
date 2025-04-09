@@ -74,9 +74,15 @@ function App() {
       let prov = new ethers.BrowserProvider(providerWithInfo.provider);
       setProvider(prov);
 
-      setSelectedWallet(providerWithInfo);
+      const accounts = await providerWithInfo.provider.request({
+        method: "eth_requestAccounts"
+      }) as string[]
 
-      await initProvider(prov);
+      setSelectedWallet(providerWithInfo);
+      setUserAccount(accounts?.[0]);      
+
+      const accountBalance = (await prov.getBalance(accounts?.[0]));
+      setBalance(ethers.formatEther(ethers.toBigInt(accountBalance)) + " ETH");
 
       let signerInstance = await prov.getSigner()
       
@@ -329,16 +335,6 @@ function App() {
     }
   }
 
-  async function initProvider(provider: AbstractProvider) {
-    let prov = provider as BrowserProvider;
-    const accounts = (await prov.listAccounts()) as JsonRpcSigner[];
-    if(userAccount == "")
-      setUserAccount(accounts?.[0].address);
-
-    const accountBalance = (await prov.getBalance(accounts?.[0]));
-    setBalance(ethers.formatEther(ethers.toBigInt(accountBalance)) + " ETH");
-  }
-
   async function checkWinnerState(gameContract: ethers.Contract) {
     try{
       let win = await gameContract.getWinner();
@@ -440,10 +436,10 @@ function App() {
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
               <TableHead>
                 <TableRow>
-                  <TableCell>Voter</TableCell>
-                  <TableCell align="right">hashed number</TableCell>
-                  <TableCell align="right">verified</TableCell>
-                  <TableCell align="right">verifiedChosenNumber</TableCell>
+                  <TableCell align='center'>Voter</TableCell>
+                  <TableCell align="center">hashed number</TableCell>
+                  <TableCell align="center">verified</TableCell>
+                  <TableCell align="center">verifiedChosenNumber</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -455,9 +451,9 @@ function App() {
                     <TableCell component="th" scope="row">
                       {bet.name}
                     </TableCell>
-                    <TableCell align="right">{bet.hashedNumber}</TableCell>
-                    <TableCell align="right">{bet.verified}</TableCell>
-                    <TableCell align="right">{bet.verifiedChosenNumber}</TableCell>
+                    <TableCell align="center">{bet.hashedNumber}</TableCell>
+                    <TableCell align="center">{bet.verified}</TableCell>
+                    <TableCell align="center">{bet.verifiedChosenNumber}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

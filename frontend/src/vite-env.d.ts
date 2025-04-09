@@ -38,7 +38,7 @@ interface EIP6963ProviderInfo {
   type EIP6963AnnounceProviderEvent = {
     detail: {
       info: EIP6963ProviderInfo
-      provider: Readonly<EIP1193Provider>
+      provider: EIP1193Provider
     }
   }
   
