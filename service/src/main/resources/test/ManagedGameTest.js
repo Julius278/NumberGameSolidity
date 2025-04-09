@@ -25,7 +25,7 @@ function base64ToPemKey(base64String) {
 }
 
 
-describe("Game Test", () => {
+describe("Managed Game Test", () => {
 
     let factory, game;
     let gameManager, player1, player2, player3;
@@ -60,7 +60,7 @@ describe("Game Test", () => {
         console.log(pub);
 
         await (await factory.connect(gameManager).createManagedGame(pub)).wait();
-        let gameAddress = await factory.connect(player1).getLastGameAddress();
+        let gameAddress = await factory.connect(player1).getLastManagedGameAddress();
         game = await GameContract.attach(gameAddress);
 
         console.log("game deployed at: %s", game.address);
