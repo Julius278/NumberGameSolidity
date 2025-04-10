@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AbstractProvider, BrowserProvider, ethers, getDefaultProvider, JsonRpcSigner } from 'ethers';
+import { AbstractProvider, BrowserProvider, ethers, getDefaultProvider } from 'ethers';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -30,7 +30,9 @@ function App() {
 
   const [selectedWallet, setSelectedWallet] = useState<EIP6963ProviderDetail>()
 
-  const factoryAddress = "0x502c822daef6a0b6424a4d5573d2c35983c99b37";
+  //TODO: get factoryAddress from e.g. environment variable
+  //const factoryAddress = "0x502c822daef6a0b6424a4d5573d2c35983c99b37";
+  const factoryAddress = "0x4e73d7f0573f946757aba44c098a0abcccb3e127"
 
   const providers = useSyncProviders();
   const [userAccount, setUserAccount] = useState<string>("");
