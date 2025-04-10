@@ -117,7 +117,8 @@ function App() {
       }));
 
       console.log("new game created");
-      
+
+      await new Promise(f => setTimeout(f, 10000));
       await retrieveGames(signerInstance);
 
     } catch (error) {
@@ -169,7 +170,9 @@ function App() {
           gasLimit: estimatedGas,
           gasPrice: gasPrice
         });
-
+        
+        await new Promise(f => setTimeout(f, 10000));
+        await retrieveBets(gameAddress, signerInstance);
 
       }
       console.log("bet call ended")
@@ -203,9 +206,16 @@ function App() {
           gasPrice: gasPrice
         });
 
+        await new Promise(f => setTimeout(f, 10000));
+        await retrieveBets(gameAddress, signerInstance);
+
+        console.log("old gameState: %s", gameState);
+        let state = await gameContract.getGameState();
+        setGameState(state);
+        console.log("new gameState: %s", gameState);
 
       }
-      console.log("bet call ended")
+      console.log("submit verify call ended")
     } catch (error) {
       console.error(error);
       setSnackBarMessage(String(error));
@@ -230,6 +240,20 @@ function App() {
         gasLimit: estimatedGas,
         gasPrice: gasPrice
       });
+
+      await new Promise(f => setTimeout(f, 15000));
+      console.log("old gameState: %s", gameState);
+      let state = await gameContract.getGameState();
+      setGameState(state);
+      console.log("new gameState: %s", state);
+      if(state == GameState.Ended){
+        checkWinnerState(gameContract);
+      } else {
+        setWinner("");
+        setWinnerPrize("");
+        setManagerFee("");
+      }
+
     } catch (error) {
       console.error(error);
       setSnackBarMessage(String(error));
@@ -253,6 +277,8 @@ function App() {
         gasPrice: gasPrice,
         gasLimit: estimatedGas
       });
+
+      await new Promise(f => setTimeout(f, 10000));
 
       let state = await gameContract.getGameState();
       setGameState(state);
@@ -280,8 +306,12 @@ function App() {
         gasLimit: estimatedGas
       });
 
+      await new Promise(f => setTimeout(f, 10000));
+      console.log("old gameState: %s", gameState);
       let state = await gameContract.getGameState();
       setGameState(state);
+      console.log("new gameState: %s", gameState);
+
     } catch (error) {
       console.error(error);
       setSnackBarMessage(String(error));
@@ -332,6 +362,10 @@ function App() {
 
     if(gameState == GameState.Ended){
       checkWinnerState(gameContract);
+    } else {
+      setWinner("");
+      setWinnerPrize("");
+      setManagerFee("");
     }
   }
 
