@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AbstractProvider, BrowserProvider, ethers, getDefaultProvider, JsonRpcSigner } from 'ethers';
+import { AbstractProvider, BrowserProvider, ethers, getDefaultProvider } from 'ethers';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
