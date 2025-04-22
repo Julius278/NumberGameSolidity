@@ -174,12 +174,12 @@ function App() {
         console.log("bet: %s", betInputValue);
         console.log(encryptedNumber);
 
-        let estimatedGas: bigint = await gameContract.bet.estimateGas(encryptedNumber, {value: ethers.parseEther("0.000000001")});
+        let estimatedGas: bigint = await gameContract.bet.estimateGas(encryptedNumber, {value: ethers.parseEther("0.001")});
         let gasPrice = (await provider.getFeeData()).gasPrice
         console.log("gasPrice: %s", gasPrice)
         console.log("estimatedGas: %s", estimatedGas)
         await gameContract.bet(encryptedNumber,{
-          value: ethers.parseEther("0.000000001"),
+          value: ethers.parseEther("0.001"),
           gasLimit: estimatedGas,
           gasPrice: gasPrice
         });
