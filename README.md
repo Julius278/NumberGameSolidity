@@ -18,4 +18,4 @@ the console should print something like:
 "VITE v6.2.4  ready in 231 ms
 ➜  Local:   http://localhost:5173/"
 
-so please follow the link and open the localhost:5173 link in your browser
+so please follow the instruction and open the localhost:5173 link in your browser
