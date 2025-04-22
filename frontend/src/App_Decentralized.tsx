@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { AbstractProvider, BrowserProvider, ethers, getDefaultProvider } from 'ethers';
 
+import chainsJson from './assets/chains.json';
+
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -84,7 +86,16 @@ function App() {
       setUserAccount(accounts?.[0]);      
 
       const accountBalance = (await prov.getBalance(accounts?.[0]));
-      setBalance(ethers.formatEther(ethers.toBigInt(accountBalance)) + " ETH");
+      const chainId = ((await prov.getNetwork()).chainId);
+      console.log("checking the native currency for %s", chainId)
+      let currency = "<currency tbd>";
+      chainsJson.forEach(chainElement => {
+        if(chainElement.chainId == chainId) {
+          console.log("found matching chainId: %s to chain '%s' and native currency '%s'", chainElement.chainId, chainElement.name, chainElement.nativeCurrency.symbol);
+          currency = chainElement.nativeCurrency.symbol;
+        }
+      });
+      setBalance(ethers.formatEther(ethers.toBigInt(accountBalance)) + " " + currency);
 
       let signerInstance = await prov.getSigner()
       
