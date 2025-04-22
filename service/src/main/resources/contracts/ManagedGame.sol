@@ -72,7 +72,7 @@ contract ManagedGame {
     }
 
     function bet(string memory _encryptedNumber) external payable bettingPhase {
-        require(msg.value == 0.000000001 ether, "Bet cost is 0.000000001 ether");
+        require(msg.value == 0.001 ether, "Bet cost is 0.001 ether");
         // require(_chosenNumber <= 1000, "_chosenNumber must be less than or equal to 1000");
         for (uint i = 0; i < bets.length; i++) {
             if (bets[i].voter == msg.sender) {

@@ -103,7 +103,7 @@ contract DecentralizedGame {
     }
 
     function bet(bytes32 _numberHash) external payable bettingPhase {
-        require(msg.value == 0.000000001 ether, "Bet cost is 0.000000001 ether");
+        require(msg.value == 0.001 ether, "Bet cost is 0.001 ether");
         if (bets.length > 0) {
             for (uint i = 0; i < bets.length; i++) {
                 if (bets[i].player == msg.sender) {
