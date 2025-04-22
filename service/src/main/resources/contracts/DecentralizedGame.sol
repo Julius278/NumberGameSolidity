@@ -104,9 +104,11 @@ contract DecentralizedGame {
 
     function bet(bytes32 _numberHash) external payable bettingPhase {
         require(msg.value == 0.000000001 ether, "Bet cost is 0.000000001 ether");
-        for (uint i = 0; i < bets.length; i++) {
-            if (bets[i].player == msg.sender) {
-                revert("Vote already taken for this address");
+        if (bets.length > 0) {
+            for (uint i = 0; i < bets.length; i++) {
+                if (bets[i].player == msg.sender) {
+                    revert("Vote already taken for this address");
+                }
             }
         }
         Bet memory newBet = Bet(payable(msg.sender), _numberHash, 0, false);
