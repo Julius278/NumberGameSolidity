@@ -35,6 +35,9 @@ contract DecentralizedGame {
     uint private winnerPrize;
     Bet[] private bets;
 
+    // defines the amount of blocks which is added to the current block when the verification phase begins, so it shows the feedback period to the verification phase in amount of blocks
+    uint256 internal verificationFeedbackBlocks;
+
     uint internal verificationUntilBlock;
 
     GameState private gameState;
@@ -86,10 +89,11 @@ contract DecentralizedGame {
         _;
     }
 
-    constructor(address _manager) {
+    constructor(address _manager, uint256 _verificationFeedbackBlocks) {
         gameState = GameState.Created;
         console.log("Game contract deployed by:", tx.origin);
         manager = _manager;
+        verificationFeedbackBlocks = _verificationFeedbackBlocks;
         emit GameCreated(manager, "some instructions");
         gameState = GameState.Betting;
     }
@@ -118,7 +122,7 @@ contract DecentralizedGame {
     function beginVerification(string memory message) external isPlayerOrManager bettingPhase {
         require(bets.length >= 3, "at least 3 bets required");
 
-        verificationUntilBlock = block.number + 50;
+        verificationUntilBlock = block.number + verificationFeedbackBlocks;
         gameState = GameState.Verification;
         emit VerificationPhaseStarted(message, verificationUntilBlock);
     }
@@ -261,5 +265,9 @@ contract DecentralizedGame {
 
     function getGameState() public view returns (GameState){
         return gameState;
+    }
+
+    function getVerificationFeedbackBlocks() public view returns (uint256){
+        return verificationFeedbackBlocks;
     }
 }
