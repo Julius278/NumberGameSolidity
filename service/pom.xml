@@ -19,8 +19,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<junit.version>5.10.2</junit.version>
-		<web3j-maven-plugin.version>4.13.0</web3j-maven-plugin.version>
-		<web3j-core.version>4.13.0</web3j-core.version>
+		<web3j-maven-plugin.version>4.14.0</web3j-maven-plugin.version>
+		<web3j-core.version>4.14.0</web3j-core.version>
 		<solidity.version>0.8.15</solidity.version>
 	</properties>
 
