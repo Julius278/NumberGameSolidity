@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.15;
 
-import "hardhat/console.sol";
+//import "hardhat/console.sol";
 
 import {ManagedGame} from "./ManagedGame.sol";
 import {DecentralizedGame} from "./DecentralizedGame.sol";
@@ -30,14 +30,14 @@ contract GameFactory {
     }
 
     function getLastManagedGameAddress() public view returns (address) {
-        console.log("number of managed games ", mGames.length);
-        console.log("address of first managed games ", address(mGames[0]));
+        //console.log("number of managed games ", mGames.length);
+        //console.log("address of first managed games ", address(mGames[0]));
         return address(mGames[0]);
     }
 
     function getLastDecentralizedGameAddress() public view returns (address) {
-        console.log("number of decentralized games ", dGames.length);
-        console.log("address of first decentralized games ", address(dGames[0]));
+        //console.log("number of decentralized games ", dGames.length);
+        //console.log("address of first decentralized games ", address(dGames[0]));
         return address(dGames[0]);
     }
 }
