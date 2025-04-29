@@ -23,7 +23,11 @@ mvn clean install
 ``` bash
 mvn exec:java -pl service -Dexec.mainClass="com.julius.web3.service.deploy.demo.DecentralizedGameDemo"
 ```
-* it's also possible to switch the EVM node address (EVM_NODE_ADDRESS) in case it's not localhost
+* it's also possible to switch the EVM node address (EVM_NODE_ADDRESS) in case it's not localhost, set a key file password (KEY_FILE_PASSWORD) or the key file path (KEY_FILE_PATH)
+  * example:
+``` bash
+KEY_FILE_PASSWORD="testSecurePassword" KEY_FILE_PATH="./keys/keyfileXYZ.json" EVM_NODE_ADDRESS="http://localhost:8545/" mvn exec:java -pl service -Dexec.mainClass="com.julius.web3.service.deploy.demo.DecentralizedGameDemo"
+```
 
 result:
 ![maven demo](doc/mvn_DecentralizedGameDemo.png)
