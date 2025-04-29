@@ -10,8 +10,6 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.gas.ContractGasProvider;
-import org.web3j.tx.gas.DefaultGasProvider;
-import org.web3j.tx.gas.DynamicEIP1559GasProvider;
 import org.web3j.tx.gas.StaticEIP1559GasProvider;
 
 import java.math.BigInteger;
@@ -20,16 +18,14 @@ import java.math.BigInteger;
 public class DecentralizedGameDemo {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(DecentralizedGameDemo.class);
-	public static final String KEY_FILE_PATH = "./service/src/main/resources/keyfile.json";
-	public static final String KEY_FILE_PASSWORD = "password";
-	//public static final String EVM_NODE_URL = "https://rpc-amoy.polygon.technology/";
-	public static final String EVM_NODE_URL = "http://localhost:8545/";
+	public static final String KEY_FILE_PATH = System.getenv().getOrDefault("KEY_FILE_PATH", "./service/src/main/resources/keyfile.json");
+	public static final String KEY_FILE_PASSWORD = System.getenv().getOrDefault("KEY_FILE_PASSWORD", "password");
+	public static final String EVM_NODE_URL = System.getenv().getOrDefault("EVM_NODE_URL", "https://rpc-amoy.polygon.technology/");
+	//public static final String EVM_NODE_URL = "http://localhost:8545/";
 
 	public static void main(String[] args) throws Exception {
-
 		// setup for general node query
 		final Web3j web3jConnection = Web3j.build(new HttpService(EVM_NODE_URL));
-		//long chainID = Long.parseLong(web3jConnection.netVersion().send().getNetVersion());
 		long chainID = web3jConnection.ethChainId().send().getChainId().longValue();
 		LOGGER.info("connected node: {}", web3jConnection.web3ClientVersion().send().getWeb3ClientVersion());
 		LOGGER.info("current block number: {}", web3jConnection.ethBlockNumber().send().getBlockNumber());
@@ -43,15 +39,12 @@ public class DecentralizedGameDemo {
 						.getBaseFeePerGas();
 		BigInteger maxFeePerGas = baseFee.multiply(BigInteger.valueOf(2)).add(maxPriorityFeePerGas);
 
+		LOGGER.info("loading credentials from file: {}", KEY_FILE_PATH);
 		// setup for sending transactions
 		final Credentials credentials = WalletUtils.loadCredentials(KEY_FILE_PASSWORD, KEY_FILE_PATH);
 		LOGGER.info("credentials: {}", credentials.getAddress());
 		LOGGER.info("funding: {}", web3jConnection.ethGetBalance(credentials.getAddress(), DefaultBlockParameterName.LATEST).send().getBalance());
-		//System.out.println(web3jConnection.ethGasPrice().send().getGasPrice());
 
-
-		//final ContractGasProvider gasProvider = EVM_NODE_ADDRESS.contains("localhost") ? new DefaultGasProvider() : new DynamicEIP1559GasProvider(web3jConnection, chainID);
-		//final ContractGasProvider gasProvider = new DynamicEIP1559GasProvider(web3jConnection, chainID);
 		final ContractGasProvider gasProvider = new StaticEIP1559GasProvider(chainID, maxFeePerGas, maxPriorityFeePerGas, BigInteger.valueOf(9000000L));
 
 		LOGGER.info("deploying GameFactory");
