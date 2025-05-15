@@ -506,7 +506,7 @@ function App() {
             </Table>
             { gameState == GameState.Betting &&            
               <form>
-                <TextField label="bet" id="betInputTextField" defaultValue="" variant="filled" name="betInput" onChange={(e) => setBetInputValue(e.target.value)} />
+                <TextField label="bet" type='number' InputProps={{ inputProps: { min: 0, max: 1000 } }} id="betInputTextField" defaultValue="" variant="filled" name="betInput" onChange={(e) => setBetInputValue(e.target.value)} />
                 <TextField label="secretPassword" id="passwordInputTextField" defaultValue="" variant="filled" name="passwordInput" onChange={(e) => setPasswordInputValue(e.target.value)} />
                 <Button key="submitBetButton" variant="contained" size='large' onClick={() => handleSubmitBet()}>submit</Button>
               </form>
@@ -524,7 +524,7 @@ function App() {
             { gameState == GameState.Verification &&            
               <div>
                 <div>
-                  <TextField label="bet" id="verifyBetInputTextField" defaultValue="" variant="filled" name="betInput" onChange={(e) => setBetInputValue(e.target.value)} />
+                  <TextField label="bet" type='number' InputProps={{ inputProps: { min: 0, max: 1000 } }} id="verifyBetInputTextField" defaultValue="" variant="filled" name="betInput" onChange={(e) => setBetInputValue(e.target.value)} />
                   <TextField label="secretPassword" id="verifyPasswordInputTextField" defaultValue="" variant="filled" name="passwordInput" onChange={(e) => setPasswordInputValue(e.target.value)} />
                   <Button key="submitVerifyButton" variant="contained" size='large' onClick={() => handleSubmitVerify()}>submit verification</Button>
                 </div>
