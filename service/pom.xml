@@ -125,12 +125,12 @@
 										<include>*.sol</include>
 									</includes>
 								</resource>
-								<resource>
+								<!--resource>
 									<directory>${basedir}/node_modules/</directory>
 									<includes>
-										<!--include>hardhat/console.sol</include-->
+										<include>hardhat/console.sol</include>
 									</includes>
-								</resource>
+								</resource-->
 							</resources>
 						</configuration>
 					</execution>
