@@ -149,7 +149,7 @@ describe("Decentralized Game Timeout Test", () => {
         let call = game.connect(player1).endGame();
         await expect(call).to.emit(game, "WinnerAnnouncement");
 
-        let winner = await game.connect(player1).getWinner();
+        let winner = await game.connect(player1).winner();
         console.log("winner of the decentralized game is: %s", winner)
         expect(winner).to.equal(player1.address);
     });

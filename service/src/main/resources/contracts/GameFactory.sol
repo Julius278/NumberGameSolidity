@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.15;
 
-import "./ManagedGame.sol";
-import "./DecentralizedGame.sol";
+import {ManagedGame} from "./ManagedGame.sol";
+import {DecentralizedGame} from "./DecentralizedGame.sol";
 
 contract GameFactory {
+
     ManagedGame[] internal mGames;
     DecentralizedGame[] internal dGames;
 
@@ -14,11 +15,7 @@ contract GameFactory {
     }
 
     function createDecentralizedGame() public {
-        createDecentralizedGame(100);
-    }
-
-    function createDecentralizedGame(uint256 _verificationFeedbackBlocks) public {
-        DecentralizedGame dGame = new DecentralizedGame(msg.sender, _verificationFeedbackBlocks);
+        DecentralizedGame dGame = new DecentralizedGame(msg.sender, 50);
         dGames.push(dGame);
     }
 

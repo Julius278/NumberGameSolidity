@@ -164,7 +164,7 @@ function App() {
       let signerInstance = await prov.getSigner()
       const gameContract = new ethers.Contract(gameAddress, getGameAbi(), signerInstance);
 
-      let managerPublicKey = await gameContract.getManagerPublicKey();
+      let managerPublicKey = await gameContract.managerPublicKey();
       console.log(managerPublicKey);
       
       if(betInputValue == ""){
@@ -253,7 +253,7 @@ function App() {
         gasLimit: estimatedGas
       });
 
-      let state = await gameContract.getGameState();
+      let state = await gameContract.gameState();
       setGameState(state);
     } catch (error) {
       console.error(error);
@@ -287,7 +287,7 @@ function App() {
     console.log("retrieve bets from contract");
     const gameContract = new ethers.Contract(gameAddress, getGameAbi(), signerInstance);
 
-    let managerAddress = await gameContract.getManager();
+    let managerAddress = await gameContract.manager();
     console.log("manager: %s", managerAddress);
     setManagerAddress(managerAddress);
 
@@ -300,7 +300,7 @@ function App() {
     setBets(votes);
     setBetsFilled(true);
 
-    let gameState = await gameContract.getGameState() as Number;
+    let gameState = await gameContract.gameState() as Number;
     setGameState(gameState)
 
     if(gameState == GameState.Ended){
@@ -310,15 +310,15 @@ function App() {
 
   async function checkWinnerState(gameContract: ethers.Contract) {
     try{
-      let win = await gameContract.getWinner();
+      let win = await gameContract.winner();
       console.log("winner: %s", win);
       setWinner(win);     
       
-      let prize = await gameContract.getWinnerPrize();
+      let prize = await gameContract.winnerPrize();
       console.log("winnerprize: %s", prize);
       setWinnerPrize(prize);
 
-      let fee = await gameContract.getManagerFee();
+      let fee = await gameContract.managerFee();
       console.log("managerFee: %s", fee)
       setManagerFee(fee);
     } catch (error) {
@@ -507,11 +507,14 @@ function App() {
   function getGameFactoryAbi(){
     return [
       // Read-Only Functions
-      "function getGames() public view returns (address[] memory)",
-      "function getLastGameAddress() public view returns (address)",
-  
+      "function getManagedGames() public view returns (address[] memory)",
+      "function getDecentralizedGames() public view returns (address[] memory)",
+      "function getLastManagedGameAddress() public view returns (address)",
+      "function getLastDecentralizedGameAddress() public view returns (address)",
+
       // Authenticated Functions
       "function createManagedGame(string memory publicKeyManager) public",
+      "function createDecentralizedGame() public",
     ];
   }
 
@@ -519,15 +522,9 @@ function App() {
     return [
       "constructor(address _manager, string memory _managerPublicKey)",
       // Read-Only Functions
-      "function getManager() external view returns (address)",
-      "function getManagerPublicKey() external view returns (string memory)",
       "function getBalance() public view returns (uint)",
-      "function getWinner() public view returns (address[] memory)",
-      "function getWinnerPrize() public view returns (uint)",
-      "function getManagerFee() public view returns (uint)",
       "function getBets() public view returns (tuple(address, string, uint)[] memory)",
-      "function getGameState() public view returns (uint)",
-  
+
       // Authenticated Functions
       "function bet(string memory _encryptedNumber) external payable",
       "function beginEvaluation(string memory decryptionKey, string memory message) external",

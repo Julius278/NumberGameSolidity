@@ -2,9 +2,17 @@
 pragma solidity 0.8.15;
 
 contract ManagedGame {
-    event GameCreated(address manager, string message);
-    event WinnerAnnouncement(address winner, uint winnerPrize, uint16 winnerBet);
-    event EvaluationPhaseStarted(string decryptionKey, string message);
+    address public manager;
+    string public managerPublicKey;
+    address payable[] public winnerList;
+    address payable public winner;
+    uint16[] private winnerBetList;
+    uint16 internal winnerBet;
+    uint public managerFee;
+    uint public winnerPrize;
+    Bet[] public bets;
+
+    GameState private gameState;
 
     struct Bet {
         address payable voter;
@@ -19,17 +27,9 @@ contract ManagedGame {
         Ended
     }
 
-    address private manager;
-    string private managerPublicKey;
-    address payable[] private winnerList;
-    address payable private winner;
-    uint16[] private winnerBetList;
-    uint16 private winnerBet;
-    uint private managerFee;
-    uint private winnerPrize;
-    Bet[] private bets;
-
-    GameState private gameState;
+    event GameCreated(address manager, string message);
+    event WinnerAnnouncement(address winner, uint winnerPrize, uint16 winnerBet);
+    event EvaluationPhaseStarted(string decryptionKey, string message);
 
     modifier isManager() {
         require(msg.sender == manager, "Caller is not manager"); _;
@@ -53,18 +53,6 @@ contract ManagedGame {
         managerPublicKey = _managerPublicKey;
         emit GameCreated(manager, "some instructions");
         gameState = GameState.Betting;
-    }
-
-    /**
-     * @dev Return manager address
-     * @return address of manager
-     */
-    function getManager() external view returns (address) {
-        return manager;
-    }
-
-    function getManagerPublicKey() external view returns (string memory) {
-        return managerPublicKey;
     }
 
     function bet(string memory _encryptedNumber) external payable bettingPhase {
@@ -93,22 +81,39 @@ contract ManagedGame {
                 }
             }
         }
-        (winner, winnerBet) = determineWinner();
+        (winner, winnerBet) = _determineWinner();
 
         managerFee = (getBalance() * 10) / 100;
         winnerPrize = (getBalance() * 90) / 100;
-        emit WinnerAnnouncement(winner, winnerPrize, winnerBet);
 
         winner.transfer(winnerPrize);
+        emit WinnerAnnouncement(winner, winnerPrize, winnerBet);
+
         payable(manager).transfer(managerFee);
+
         gameState = GameState.Ended;
     }
 
-    function determineWinner() internal evaluationPhase returns (address payable, uint16) {
+    function getBalance() public view returns (uint){
+        return address(this).balance;
+    }
+
+    function getBets() external view returns (Bet[] memory) {
+        return bets;
+    }
+
+    function _getRandomWinner(address payable[] memory _winnerList, uint16[] memory _winnerBetList) internal view returns (address payable, uint16) {
+        uint256 hash = uint256(keccak256(abi.encodePacked(_winnerList, _winnerBetList, block.number, block.timestamp)));
+        uint256 m = hash % _winnerList.length;
+        return (_winnerList[m], _winnerBetList[m]);
+    }
+
+    function _determineWinner() internal evaluationPhase returns (address payable, uint16) {
         uint sum = 0;
         for (uint i = 0; i < bets.length; i++) {
             sum += bets[i].decryptedChosenNumber;
         }
+
         uint average = (sum / bets.length) * 2 / 3;
         uint lowestDiff;
 
@@ -135,42 +140,52 @@ contract ManagedGame {
             }
         }
         if(winnerList.length > 1){
-            return getRandomWinner(winnerList, winnerBetList);
+            return _getRandomWinner(winnerList, winnerBetList);
         }
         return (winnerList[0], winnerBetList[0]);
     }
 
-    function getRandomWinner(address payable[] memory _winnerList, uint16[] memory _winnerBetList) internal view returns (address payable, uint16) {
-        uint256 hash = uint256(keccak256(abi.encodePacked(_winnerList, _winnerBetList, block.number, block.timestamp)));
-        uint256 m = hash % _winnerList.length;
-        return (_winnerList[m], _winnerBetList[m]);
+
+    // an idea because at first I thought its 2/3 of a random number
+
+    /*
+    function generateRandomNumber() public view returns (uint256) {
+        uint256 random = uint256(keccak256(abi.encodePacked(block.timestamp, msg.sender, bets.length, msg.sig))) % 1000;
+        return random;
     }
 
-    function getBalance() public view returns (uint){
-        return address(this).balance;
-    }
+    function _determineWinner(uint256 randomNumber) internal bettingPhase returns (address payable[] memory, uint16[] memory){
+        console.log("determineWinner - randomNumber: %s", randomNumber);
 
-    function getWinnerList() public view gameEnded returns (address payable[] memory){
-        return winnerList;
-    }
+        uint lowestDiff;
 
-    function getWinner() public view gameEnded returns (address payable){
-        return winner;
-    }
+        for (uint i = 0; i < bets.length; i++) {
+            int diff = int256(randomNumber) - int256(uint256(bets[i].decryptedChosenNumber));
+            if (diff < 0) {
+                diff *= - 1;
+            }
+            if (i == 0) {
+                lowestDiff = uint(diff);
+                winner.push(bets[i].voter);
+                winnerBet.push(bets[i].decryptedChosenNumber);
+                console.log("first checked bet is: '%s' from '%s', with a diff of '%s'", bets[i].decryptedChosenNumber, bets[i].voter, lowestDiff);
+            } else {
+                console.log("next checked bet is: '%s' from '%s', with a diff of '%s'", bets[i].voter, bets[i].voter, uint(diff));
+                if (lowestDiff > uint(diff)) {
+                    delete winner;
+                    delete winnerBet;
+                    console.log("old lowestDiff is: %s, new one is: %s, emptied winner and winnerBet arrays", lowestDiff, uint(diff));
+                    lowestDiff = uint(diff);
+                    winner.push(bets[i].voter);
+                    winnerBet.push(bets[i].decryptedChosenNumber);
+                } else if (lowestDiff == uint(diff)) { //if diff is same, push
+                    console.log("same lowestDiff: %s as the current winner, push the new winner additionally to the winner array: '%s'", uint(diff), bets[i].voter);
 
-    function getWinnerPrize() public view gameEnded returns (uint){
-        return winnerPrize;
-    }
-
-    function getManagerFee() public view gameEnded returns (uint){
-        return managerFee;
-    }
-
-    function getBets() public view returns (Bet[] memory){
-        return bets;
-    }
-
-    function getGameState() public view returns (GameState){
-        return gameState;
-    }
+                    winner.push(bets[i].voter);
+                    winnerBet.push(bets[i].decryptedChosenNumber);
+                }
+            }
+        }
+        return (winner, winnerBet);
+    }*/
 }

@@ -53,7 +53,7 @@ public class ManagedGameDemo {
 
 		ManagedGame game = ManagedGame.load(gameAddress, web3jConnection, credentials, gasProvider);
 		LOGGER.info("loaded ManagedGame");
-		String manager = game.getManager().send();
+		String manager = game.manager().send();
 		LOGGER.info("manager: {}", manager);
 		List<ManagedGame.Bet> bets = game.getBets().send();
 		bets.forEach(bet -> System.out.println("bet " + bet.voter + ", " + bet.encryptedNumber));

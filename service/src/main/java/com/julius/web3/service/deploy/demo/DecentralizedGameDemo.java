@@ -69,7 +69,7 @@ public class DecentralizedGameDemo {
 
 		DecentralizedGame game = DecentralizedGame.load(gameAddress, web3jConnection, credentials, gasProvider);
 		LOGGER.info("loaded DecentralizedGame");
-		String manager = game.getManager().send();
+		String manager = game.manager().send();
 		LOGGER.info("manager '{}' successfully deployed the GameFactory and created a decentralized game", manager);
 		/*List<ManagedGame.Bet> bets = game.getBets().send();
 		bets.forEach(bet -> System.out.println("bet " + bet.voter + ", " + bet.encryptedNumber));*/
