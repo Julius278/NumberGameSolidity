@@ -13,4 +13,12 @@
 		<module>service</module>
 	</modules>
 
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub NumberGameSolidity project</name>
+			<url>https://maven.pkg.github.com/Julius278/NumberGameSolidity</url>
+		</repository>
+	</distributionManagement>
+
 </project>
