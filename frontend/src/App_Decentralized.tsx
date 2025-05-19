@@ -222,7 +222,7 @@ function App() {
         await retrieveBets(gameAddress, signerInstance);
 
         console.log("old gameState: %s", gameState);
-        let state = await gameContract.getGameState();
+        let state = await gameContract.gameState();
         setGameState(state);
         console.log("new gameState: %s", gameState);
 
@@ -255,7 +255,7 @@ function App() {
 
       await new Promise(f => setTimeout(f, 15000));
       console.log("old gameState: %s", gameState);
-      let state = await gameContract.getGameState();
+      let state = await gameContract.gameState();
       setGameState(state);
       console.log("new gameState: %s", state);
       if(state == GameState.Ended){
@@ -292,7 +292,7 @@ function App() {
 
       await new Promise(f => setTimeout(f, 10000));
 
-      let state = await gameContract.getGameState();
+      let state = await gameContract.gameState();
       setGameState(state);
     } catch (error) {
       console.error(error);
@@ -320,7 +320,7 @@ function App() {
 
       await new Promise(f => setTimeout(f, 10000));
       console.log("old gameState: %s", gameState);
-      let state = await gameContract.getGameState();
+      let state = await gameContract.gameState();
       setGameState(state);
       console.log("new gameState: %s", gameState);
 
@@ -356,7 +356,7 @@ function App() {
     console.log("retrieve bets from contract");
     const gameContract = new ethers.Contract(gameAddress, getGameAbi(), signerInstance);
 
-    let managerAddress = await gameContract.getManager();
+    let managerAddress = await gameContract.manager();
     console.log("manager: %s", managerAddress);
     setManagerAddress(managerAddress);
 
@@ -369,7 +369,7 @@ function App() {
     setBets(votes);
     setBetsFilled(true);
 
-    let gameState = await gameContract.getGameState() as Number;
+    let gameState = await gameContract.gameState() as Number;
     setGameState(gameState)
 
     if(gameState == GameState.Ended){
@@ -383,15 +383,15 @@ function App() {
 
   async function checkWinnerState(gameContract: ethers.Contract) {
     try{
-      let win = await gameContract.getWinner();
+      let win = await gameContract.winner();
       console.log("winner: %s", win);
       setWinner(win);     
       
-      let prize = await gameContract.getWinnerPrize();
+      let prize = await gameContract.winnerPrize();
       console.log("winnerprize: %s", prize);
       setWinnerPrize(prize);
 
-      let fee = await gameContract.getManagerFee();
+      let fee = await gameContract.managerFee();
       console.log("managerFee: %s", fee)
       setManagerFee(fee);
     } catch (error) {
@@ -609,19 +609,13 @@ function App() {
     return [
       "constructor(address _manager)",
       // Read-Only Functions
-      "function getManager() external view returns (address)",
       "function getBalance() public view returns (uint)",
-      "function getPossibleWinnerList() public view returns (address[] memory)",
-      "function getWinner() public view returns (address)",
-      "function getWinnerPrize() public view returns (uint)",
-      "function getManagerFee() public view returns (uint)",
       "function getBets() public view returns (tuple(address, bytes32, uint16, bool)[] memory)",
-      "function getGameState() public view returns (uint)",
-  
+
       // Authenticated Functions
       "function bet(bytes32 _numberHash) external payable",
       "function beginVerification(string memory message) external",
-      "function verifyEncryptedNumber(uint16 _chosenNumer, string memory _secretPassword) external",
+      "function verifyEncryptedNumber(uint16 _chosenNumber, string memory _secretPassword) external",
       "function beginEvaluation(string memory message) external",
       "function endGame() external",
 

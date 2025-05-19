@@ -74,7 +74,7 @@ describe("Managed Game Test", () => {
     it("player1 places a bet", async () => {
         const chosenNumber = 500;
 
-        let managerPublicKey = await game.connect(player1).getManagerPublicKey();
+        let managerPublicKey = await game.connect(player1).managerPublicKey();
 
         const encryptedNumberString = encryptMessage(managerPublicKey, chosenNumber);
 
@@ -91,7 +91,7 @@ describe("Managed Game Test", () => {
     it("player2 places a bet", async () => {
         const chosenNumber = 350;
 
-        let managerPublicKey = await game.connect(player2).getManagerPublicKey();
+        let managerPublicKey = await game.connect(player2).managerPublicKey();
 
         //const encryptedNumberString = await encryptChosenNumber(player2Crypt, chosenNumber, managerPublicKey);
         const encryptedNumberString = encryptMessage(managerPublicKey, chosenNumber);
@@ -121,7 +121,7 @@ describe("Managed Game Test", () => {
     it("player3 places a bet", async () => {
         const chosenNumber = 400;
 
-        let managerPublicKey = await game.connect(player3).getManagerPublicKey();
+        let managerPublicKey = await game.connect(player3).managerPublicKey();
 
         const encryptedNumberString = encryptMessage(managerPublicKey, chosenNumber);
 

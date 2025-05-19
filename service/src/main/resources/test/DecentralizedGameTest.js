@@ -64,6 +64,7 @@ describe("Decentralized Game Test", () => {
 
         const options = {value: ethers.utils.parseEther("0.001")}
         await game.connect(player1).bet(hashedNumber, options);
+        console.log("player1 placed bet");
 
         let bets = await game.connect(player1).getBets();
 
@@ -117,7 +118,7 @@ describe("Decentralized Game Test", () => {
     });
 
     /*it("gameManager tries to end the game without calling beginEvaluation", async () => {
-        let bets = await game.connect(gameManager).getBets();
+        let bets = await game.connect(gameManager).bets();
 
         let playerAddresses = [bets[0].voter, bets[1].voter, bets[2].voter];
         let values = [900, 900, 600];
@@ -152,7 +153,7 @@ describe("Decentralized Game Test", () => {
         let call = game.connect(player1).endGame();
         await expect(call).to.emit(game, "WinnerAnnouncement");
 
-        let winner = await game.connect(player1).getWinner();
+        let winner = await game.connect(player1).winner();
         console.log("winner of the decentralized game is: %s", winner)
         expect(winner).to.equal(player2.address);
     });
