@@ -609,6 +609,11 @@ function App() {
     return [
       "constructor(address _manager)",
       // Read-Only Functions
+      "function manager() public view returns (address)",
+      "function gameState() public view returns (uint256)",
+      "function winner() public view returns (address)",
+      "function winnerPrize() public view returns (uint256)",
+      "function managerFee() public view returns (uint256)",
       "function getBalance() public view returns (uint)",
       "function getBets() public view returns (tuple(address, bytes32, uint16, bool)[] memory)",
 
