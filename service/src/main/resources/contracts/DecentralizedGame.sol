@@ -3,16 +3,16 @@ pragma solidity 0.8.15;
 
 contract DecentralizedGame {
     address public manager;
-    address payable[] private possibleWinnerList;
+    address payable[] private _possibleWinnerList;
     address payable public winner;
-    uint16[] private winnerBetList;
-    uint16 internal winnerBet;
+    uint16[] private _winnerBetList;
+    uint16 internal _winnerBet;
     uint public managerFee;
     uint public winnerPrize;
 
     // defines the amount of blocks which is added to the current block when the verification phase begins, so it shows the feedback period to the verification phase in amount of blocks
     uint256 public verificationFeedbackBlocks;
-    uint internal verificationUntilBlock;
+    uint internal _verificationUntilBlock;
 
     Bet[] private bets;
     GameState public gameState;
@@ -92,7 +92,7 @@ contract DecentralizedGame {
         gameState = GameState.Betting;
     }
 
-    function bet(bytes32 _numberHash) external payable bettingPhase {
+    function bet(bytes32 numberHash) external payable bettingPhase {
         require(msg.value == 0.001 ether, "Bet cost is 0.001 ether");
         if (bets.length > 0) {
             for (uint i = 0; i < bets.length; i++) {
@@ -101,29 +101,29 @@ contract DecentralizedGame {
                 }
             }
         }
-        Bet memory newBet = Bet(payable(msg.sender), _numberHash, 0, false);
+        Bet memory newBet = Bet(payable(msg.sender), numberHash, 0, false);
         bets.push(newBet);
     }
 
     function beginVerification(string memory message) external isPlayerOrManager bettingPhase {
         require(bets.length >= 3, "at least 3 bets required");
 
-        verificationUntilBlock = block.number + verificationFeedbackBlocks;
+        _verificationUntilBlock = block.number + verificationFeedbackBlocks;
         gameState = GameState.Verification;
-        emit VerificationPhaseStarted(message, verificationUntilBlock);
+        emit VerificationPhaseStarted(message, _verificationUntilBlock);
     }
 
-    function verifyEncryptedNumber(uint16 _chosenNumber, string memory _secretPassword) external isPlayer verificationPhase {
-        require(_chosenNumber <= 1000, "_chosenNumber must be less than or equal to 1000"); //uint already checks that it equals 0 or is greater
-        require(verificationUntilBlock >= block.number, "verificationPhase already ended cause the block defined in verificationUntilBlock has been exceeded");
+    function verifyEncryptedNumber(uint16 chosenNumber, string memory secretPassword) external isPlayer verificationPhase {
+        require(chosenNumber <= 1000, "_chosenNumber must be less than or equal to 1000"); //uint already checks that it equals 0 or is greater
+        require(_verificationUntilBlock >= block.number, "verificationPhase already ended cause the block defined in verificationUntilBlock has been exceeded");
 
         bool allBetsVerified = true;
 
-        bytes32 hash = keccak256(abi.encodePacked(_chosenNumber, _secretPassword, msg.sender));
+        bytes32 hash = keccak256(abi.encodePacked(chosenNumber, secretPassword, msg.sender));
         for (uint i = 0; i < bets.length; i++) {
             if (bets[i].player == msg.sender) {
                 require(uint256(hash) == uint256(bets[i].hashedNumber), "chosenNumber or secretPassword input incorrect");
-                bets[i].verifiedChosenNumber = _chosenNumber;
+                bets[i].verifiedChosenNumber = chosenNumber;
                 bets[i].verified = true;
             }
             if (bets[i].verified == false) {
@@ -139,27 +139,27 @@ contract DecentralizedGame {
 
     //maybe not needed for this implementation, maybe directly to endGame
     function beginEvaluation(string memory message) external isPlayer verificationPhase {
-        require(verificationUntilBlock < block.number, "evaluation cant start because the verificationUntilBlock is not reached");
+        require(_verificationUntilBlock < block.number, "evaluation cant start because the verificationUntilBlock is not reached");
 
         gameState = GameState.Evaluation;
         emit EvaluationPhaseStarted(message);
     }
 
     function endGame() external isPlayerOrManager evaluationPhase {
-        (winner, winnerBet) = _determineWinner();
+        (winner, _winnerBet) = _determineWinner();
 
         managerFee = (getBalance() * 10) / 100;
         winnerPrize = (getBalance() * 90) / 100;
 
         winner.transfer(winnerPrize);
-        emit WinnerAnnouncement(winner, winnerPrize, winnerBet);
+        emit WinnerAnnouncement(winner, winnerPrize, _winnerBet);
 
         payable(manager).transfer(managerFee);
         gameState = GameState.Ended;
     }
 
     function getPossibleWinnerList() external view gameEnded returns (address payable[] memory) {
-        return possibleWinnerList;
+        return _possibleWinnerList;
     }
 
     function getBets() external view returns (Bet[] memory) {
@@ -188,32 +188,32 @@ contract DecentralizedGame {
                     diff *= - 1;
                 }
                 if (lowestDiff > uint(diff)) {
-                    delete possibleWinnerList;
-                    delete winnerBetList;
+                    delete _possibleWinnerList;
+                    delete _winnerBetList;
                     lowestDiff = uint(diff);
-                    possibleWinnerList.push(bets[i].player);
-                    winnerBetList.push(bets[i].verifiedChosenNumber);
+                    _possibleWinnerList.push(bets[i].player);
+                    _winnerBetList.push(bets[i].verifiedChosenNumber);
                 } else if (lowestDiff == uint(diff)) { //if diff is same, push
-                    possibleWinnerList.push(bets[i].player);
-                    winnerBetList.push(bets[i].verifiedChosenNumber);
+                    _possibleWinnerList.push(bets[i].player);
+                    _winnerBetList.push(bets[i].verifiedChosenNumber);
                 }
             }
         }
-        if (possibleWinnerList.length > 1) {
-            return _getRandomWinner(possibleWinnerList, winnerBetList);
+        if (_possibleWinnerList.length > 1) {
+            return _getRandomWinner(_possibleWinnerList, _winnerBetList);
         }
-        return (possibleWinnerList[0], winnerBetList[0]);
+        return (_possibleWinnerList[0], _winnerBetList[0]);
     }
 
-    function _getRandomWinner(address payable[] memory _winnerList, uint16[] memory _winnerBetList) internal view returns (address payable, uint16) {
+    function _getRandomWinner(address payable[] memory winnerList, uint16[] memory winnerBetList) internal view returns (address payable, uint16) {
         uint256 hash = uint256(keccak256(abi.encodePacked(
-            _winnerList,
-            _winnerBetList,
+            winnerList,
+            winnerBetList,
             block.number,
             block.timestamp,
             blockhash(block.number - 1)
         )));
-        uint256 m = hash % _winnerList.length;
-        return (_winnerList[m], _winnerBetList[m]);
+        uint256 m = hash % winnerList.length;
+        return (winnerList[m], winnerBetList[m]);
     }
 }
