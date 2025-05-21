@@ -18,13 +18,13 @@ public class DecentralizedGameDemo {
 	public static final Logger LOGGER = LoggerFactory.getLogger(DecentralizedGameDemo.class);
 	public static final String KEY_FILE_PATH = "./service/src/main/resources/keyfile.json";
 	public static final String KEY_FILE_PASSWORD = "password";
-	//public static final String ETH_NODE_ADDRESS = "https://rpc-amoy.polygon.technology/";
-	public static final String ETH_NODE_ADDRESS = "http://localhost:8545/";
+	//public static final String EVM_NODE_ADDRESS = "https://rpc-amoy.polygon.technology/";
+	public static final String EVM_NODE_ADDRESS = "http://localhost:8545/";
 
 	public static void main(String[] args) throws Exception {
 
 		// setup for general node query
-		final Web3j web3jConnection = Web3j.build(new HttpService(ETH_NODE_ADDRESS));
+		final Web3j web3jConnection = Web3j.build(new HttpService(EVM_NODE_ADDRESS));
 		long chainID = Long.parseLong(web3jConnection.netVersion().send().getNetVersion());
 		LOGGER.info("connected node: {}", web3jConnection.web3ClientVersion().send().getWeb3ClientVersion());
 		LOGGER.info("current block number: {}", web3jConnection.ethBlockNumber().send().getBlockNumber());
@@ -35,6 +35,8 @@ public class DecentralizedGameDemo {
 		LOGGER.info("credentials: {}", credentials.getAddress());
 		LOGGER.info("funding: {}", web3jConnection.ethGetBalance(credentials.getAddress(), DefaultBlockParameterName.LATEST).send().getBalance());
 		//System.out.println(web3jConnection.ethGasPrice().send().getGasPrice());
+
+
 		final ContractGasProvider gasProvider = new DynamicEIP1559GasProvider(web3jConnection, chainID);
 		//final ContractGasProvider gasProvider = new DefaultGasProvider();
 
