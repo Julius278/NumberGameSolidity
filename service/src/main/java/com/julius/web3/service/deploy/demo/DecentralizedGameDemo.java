@@ -10,6 +10,7 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.gas.ContractGasProvider;
+import org.web3j.tx.gas.DynamicEIP1559GasProvider;
 import org.web3j.tx.gas.StaticEIP1559GasProvider;
 
 import java.math.BigInteger;
@@ -27,6 +28,7 @@ public class DecentralizedGameDemo {
 		// setup for general node query
 		final Web3j web3jConnection = Web3j.build(new HttpService(EVM_NODE_URL));
 		long chainID = web3jConnection.ethChainId().send().getChainId().longValue();
+		LOGGER.info("EVM_NODE_URL: {}", EVM_NODE_URL);
 		LOGGER.info("connected node: {}", web3jConnection.web3ClientVersion().send().getWeb3ClientVersion());
 		LOGGER.info("current block number: {}", web3jConnection.ethBlockNumber().send().getBlockNumber());
 		LOGGER.info("chainID: {}", chainID);
@@ -45,7 +47,15 @@ public class DecentralizedGameDemo {
 		LOGGER.info("credentials: {}", credentials.getAddress());
 		LOGGER.info("funding: {}", web3jConnection.ethGetBalance(credentials.getAddress(), DefaultBlockParameterName.LATEST).send().getBalance());
 
-		final ContractGasProvider gasProvider = new StaticEIP1559GasProvider(chainID, maxFeePerGas, maxPriorityFeePerGas, BigInteger.valueOf(9000000L));
+		// setup gas provider depending on EVM_NODE_URL
+		ContractGasProvider gasProvider;
+		if (EVM_NODE_URL.contains("localhost") || EVM_NODE_URL.contains("127.0.0.1")) {
+			LOGGER.info("localhost detected, using StaticEIP1559GasProvider");
+			gasProvider = new StaticEIP1559GasProvider(chainID, maxFeePerGas, maxPriorityFeePerGas, BigInteger.valueOf(9000000L));
+		} else {
+			LOGGER.info("no localhost, using DynamicEIP1559GasProvider");
+			gasProvider = new DynamicEIP1559GasProvider(web3jConnection, chainID);
+		}
 
 		LOGGER.info("deploying GameFactory");
 		GameFactory factory = GameFactory.deploy(web3jConnection, credentials, gasProvider).send();
