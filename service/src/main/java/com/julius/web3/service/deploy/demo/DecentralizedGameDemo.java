@@ -2,7 +2,6 @@ package com.julius.web3.service.deploy.demo;
 
 import com.julius.web3.contracts.DecentralizedGame;
 import com.julius.web3.contracts.GameFactory;
-import com.julius.web3.contracts.ManagedGame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.web3j.crypto.Credentials;
@@ -11,10 +10,7 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.gas.ContractGasProvider;
-import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.tx.gas.DynamicEIP1559GasProvider;
-
-import java.util.List;
 
 
 public class DecentralizedGameDemo {
@@ -22,14 +18,14 @@ public class DecentralizedGameDemo {
 	public static final Logger LOGGER = LoggerFactory.getLogger(DecentralizedGameDemo.class);
 	public static final String KEY_FILE_PATH = "./service/src/main/resources/keyfile.json";
 	public static final String KEY_FILE_PASSWORD = "password";
-	public static final String ETH_SERVER_ADDRESS = "https://rpc-amoy.polygon.technology/";
-	//public static final String ETH_SERVER_ADDRESS = "http://localhost:8545/";
+	//public static final String ETH_NODE_ADDRESS = "https://rpc-amoy.polygon.technology/";
+	public static final String ETH_NODE_ADDRESS = "http://localhost:8545/";
 
 	public static void main(String[] args) throws Exception {
 
 		// setup for general node query
-		final Web3j web3jConnection = Web3j.build(new HttpService(ETH_SERVER_ADDRESS));
-		Long chainID = Long.parseLong(web3jConnection.netVersion().send().getNetVersion());
+		final Web3j web3jConnection = Web3j.build(new HttpService(ETH_NODE_ADDRESS));
+		long chainID = Long.parseLong(web3jConnection.netVersion().send().getNetVersion());
 		LOGGER.info("connected node: {}", web3jConnection.web3ClientVersion().send().getWeb3ClientVersion());
 		LOGGER.info("current block number: {}", web3jConnection.ethBlockNumber().send().getBlockNumber());
 		LOGGER.info("chainID: {}", chainID);
@@ -55,8 +51,8 @@ public class DecentralizedGameDemo {
 		DecentralizedGame game = DecentralizedGame.load(gameAddress, web3jConnection, credentials, gasProvider);
 		LOGGER.info("loaded DecentralizedGame");
 		String manager = game.getManager().send();
-		LOGGER.info("manager: {}", manager);
-		List<ManagedGame.Bet> bets = game.getBets().send();
-		bets.forEach(bet -> System.out.println("bet " + bet.voter + ", " + bet.encryptedNumber));
+		LOGGER.info("manager '{}' successfully deployed the GameFactory and create a decentralized game", manager);
+		/*List<ManagedGame.Bet> bets = game.getBets().send();
+		bets.forEach(bet -> System.out.println("bet " + bet.voter + ", " + bet.encryptedNumber));*/
 	}
 }
