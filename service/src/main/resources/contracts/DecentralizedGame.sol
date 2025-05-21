@@ -2,11 +2,18 @@
 pragma solidity 0.8.15;
 
 contract DecentralizedGame {
-
-    event GameCreated(address manager, string message);
-    event WinnerAnnouncement(address winner, uint winnerPrize, uint16 winnerBet);
-    event VerificationPhaseStarted(string message, uint untilBlock);
-    event EvaluationPhaseStarted(string message);
+    address private manager;
+    address payable[] private possibleWinnerList;
+    address payable private winner;
+    uint16[] private winnerBetList;
+    uint16 private winnerBet;
+    uint private managerFee;
+    uint private winnerPrize;
+    // defines the amount of blocks which is added to the current block when the verification phase begins, so it shows the feedback period to the verification phase in amount of blocks
+    uint256 internal verificationFeedbackBlocks;
+    uint internal verificationUntilBlock;
+    Bet[] private bets;
+    GameState private gameState;
 
     struct Bet {
         address payable player;
@@ -23,21 +30,10 @@ contract DecentralizedGame {
         Ended
     }
 
-    address private manager;
-    address payable[] private possibleWinnerList;
-    address payable private winner;
-    uint16[] private winnerBetList;
-    uint16 private winnerBet;
-    uint private managerFee;
-    uint private winnerPrize;
-    Bet[] private bets;
-
-    // defines the amount of blocks which is added to the current block when the verification phase begins, so it shows the feedback period to the verification phase in amount of blocks
-    uint256 internal verificationFeedbackBlocks;
-
-    uint internal verificationUntilBlock;
-
-    GameState private gameState;
+    event GameCreated(address manager, string message);
+    event WinnerAnnouncement(address winner, uint winnerPrize, uint16 winnerBet);
+    event VerificationPhaseStarted(string message, uint untilBlock);
+    event EvaluationPhaseStarted(string message);
 
     modifier isManager() {
         require(msg.sender == manager, "Caller is not manager");
@@ -148,7 +144,7 @@ contract DecentralizedGame {
     }
 
     function endGame() external isPlayerOrManager evaluationPhase {
-        (winner, winnerBet) = determineWinner();
+        (winner, winnerBet) = _determineWinner();
 
         managerFee = (getBalance() * 10) / 100;
         winnerPrize = (getBalance() * 90) / 100;
@@ -200,7 +196,7 @@ contract DecentralizedGame {
         return address(this).balance;
     }
 
-    function determineWinner() internal evaluationPhase returns (address payable, uint16) {
+    function _determineWinner() internal evaluationPhase returns (address payable, uint16) {
         uint sum = 0;
         for (uint i = 0; i < bets.length; i++) {
             if (bets[i].verified) {
@@ -230,12 +226,12 @@ contract DecentralizedGame {
             }
         }
         if (possibleWinnerList.length > 1) {
-            return getRandomWinner(possibleWinnerList, winnerBetList);
+            return _getRandomWinner(possibleWinnerList, winnerBetList);
         }
         return (possibleWinnerList[0], winnerBetList[0]);
     }
 
-    function getRandomWinner(address payable[] memory _winnerList, uint16[] memory _winnerBetList) internal view returns (address payable, uint16) {
+    function _getRandomWinner(address payable[] memory _winnerList, uint16[] memory _winnerBetList) internal view returns (address payable, uint16) {
         uint256 hash = uint256(keccak256(abi.encodePacked(
             _winnerList,
             _winnerBetList,
