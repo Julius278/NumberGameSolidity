@@ -106,6 +106,12 @@ describe("Game Test", () => {
         expect(bets.length).to.equal(2);
     });
 
+    it("gameManager tries to begin evaluation with only two bets", async () => {
+        let privKey = keyToBase64String(forge.pki.privateKeyToPem(privateKey));
+        let call = game.connect(gameManager).beginEvaluation(privKey, "some stuff");
+        await expect(call).to.be.revertedWith("at least 3 bets required");
+    });
+
     it("player2 tries to place a second bet and fails", async () => {
         const options = {value: ethers.utils.parseEther("0.000000001")}
         let call = game.connect(player2).bet("encryptedNumberString", options);
