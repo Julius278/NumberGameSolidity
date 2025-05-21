@@ -178,13 +178,11 @@
 						<directory>${basedir}/target/contracts</directory>
 						<includes>
 							<include>*.sol</include>
-							<include>@openzeppelin/**/*.sol</include>
-							<include>hardhat/*.sol</include>
+							<!--include>hardhat/*.sol</include-->
 						</includes>
 					</soliditySourceFiles>
 					<pathPrefixes>
-						<pathPrefix>@openzeppelin=./@openzeppelin</pathPrefix>
-						<pathPrefix>hardhat=./hardhat</pathPrefix>
+						<!--pathPrefix>hardhat=./hardhat</pathPrefix-->
 					</pathPrefixes>
 				</configuration>
 			</plugin>
