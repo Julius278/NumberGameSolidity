@@ -14,7 +14,11 @@ contract GameFactory {
     }
 
     function createDecentralizedGame() public {
-        DecentralizedGame dGame = new DecentralizedGame(msg.sender, 50);
+        createDecentralizedGame(100);
+    }
+
+    function createDecentralizedGame(uint256 _verificationFeedbackBlocks) public {
+        DecentralizedGame dGame = new DecentralizedGame(msg.sender, _verificationFeedbackBlocks);
         dGames.push(dGame);
     }
 
