@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.15;
 
-import "hardhat/console.sol";
+//import "hardhat/console.sol";
 
 contract ManagedGame {
     event GameCreated(address manager, string message);
@@ -51,7 +51,7 @@ contract ManagedGame {
 
     constructor(address _manager, string memory _managerPublicKey) {
         gameState = GameState.Created;
-        console.log("Game contract deployed by:", tx.origin);
+        //console.log("Game contract deployed by:", tx.origin);
         manager = _manager;
         managerPublicKey = _managerPublicKey;
         emit GameCreated(manager, "some instructions");
@@ -101,29 +101,29 @@ contract ManagedGame {
 
         managerFee = (getBalance() * 10) / 100;
         winnerPrize = (getBalance() * 90) / 100;
-        console.log("number of winners: %s, so the winnerPrize is: %s", winner, winnerPrize);
+        //console.log("number of winners: %s, so the winnerPrize is: %s", winner, winnerPrize);
 
-        console.log("transferring winnerPrize '%s' to '%s'", winnerPrize, winner);
+        //console.log("transferring winnerPrize '%s' to '%s'", winnerPrize, winner);
         winner.transfer(winnerPrize);
         emit WinnerAnnouncement(winner, winnerPrize, winnerBet);
 
-        console.log("transferring managerFee '%s' to manager '%s'", managerFee, manager);
+        //console.log("transferring managerFee '%s' to manager '%s'", managerFee, manager);
         payable(manager).transfer(managerFee);
 
         gameState = GameState.Ended;
     }
 
     function determineWinner() internal evaluationPhase returns (address payable, uint16) {
-        console.log("determineWinner - by players average number");
+        //console.log("determineWinner - by players average number");
 
         uint sum = 0;
         for (uint i = 0; i < bets.length; i++) {
             sum += bets[i].decryptedChosenNumber;
         }
-        console.log("sum of all players equals: %s", sum);
+        //console.log("sum of all players equals: %s", sum);
 
         uint average = (sum / bets.length) * 2 / 3;
-        console.log("two third average is: %s", average);
+        //console.log("two third average is: %s", average);
 
         uint lowestDiff;
 
@@ -136,18 +136,18 @@ contract ManagedGame {
                 lowestDiff = uint(diff);
                 winnerList.push(bets[i].voter);
                 winnerBetList.push(bets[i].decryptedChosenNumber);
-                console.log("first checked bet is: '%s' from '%s', with a diff of '%s'", bets[i].decryptedChosenNumber, bets[i].voter, lowestDiff);
+                //console.log("first checked bet is: '%s' from '%s', with a diff of '%s'", bets[i].decryptedChosenNumber, bets[i].voter, lowestDiff);
             } else {
-                console.log("next checked bet is: '%s' from '%s', with a diff of '%s'", bets[i].decryptedChosenNumber, bets[i].voter, uint(diff));
+                //console.log("next checked bet is: '%s' from '%s', with a diff of '%s'", bets[i].decryptedChosenNumber, bets[i].voter, uint(diff));
                 if (lowestDiff > uint(diff)) {
                     delete winnerList;
                     delete winnerBetList;
-                    console.log("old lowestDiff is: %s, new one is: %s, emptied winner and winnerBet arrays", lowestDiff, uint(diff));
+                    //console.log("old lowestDiff is: %s, new one is: %s, emptied winner and winnerBet arrays", lowestDiff, uint(diff));
                     lowestDiff = uint(diff);
                     winnerList.push(bets[i].voter);
                     winnerBetList.push(bets[i].decryptedChosenNumber);
                 } else if (lowestDiff == uint(diff)) { //if diff is same, push
-                    console.log("same lowestDiff: %s as the current winner, push the new winner additionally to the winner array: '%s'", uint(diff), bets[i].voter);
+                    //console.log("same lowestDiff: %s as the current winner, push the new winner additionally to the winner array: '%s'", uint(diff), bets[i].voter);
 
                     winnerList.push(bets[i].voter);
                     winnerBetList.push(bets[i].decryptedChosenNumber);
