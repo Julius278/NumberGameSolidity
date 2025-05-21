@@ -39,6 +39,14 @@ you can copy the "GameFactory address" from the commandline to continue with you
 * node version 18+, I tested with node v18.20.8
 * running EVM based blockchain node (e.g. Hyperledger Besu), ideally the same one as before
 
+#### install npm dependencies
+inside the root directory of this project call:
+
+``` bash
+cd frontend
+npm install
+```
+
 ### run the frontend
 inside the root directory of this project call:
 
