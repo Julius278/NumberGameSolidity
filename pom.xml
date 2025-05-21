@@ -5,7 +5,7 @@
 
 	<groupId>com.julius.web3</groupId>
 	<artifactId>number-game-solidity</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<description>Demo project for university assignment</description>
 	<packaging>pom</packaging>
 
