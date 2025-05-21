@@ -1,0 +1,42 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+title TwoThird NumberGame
+
+participant Manager
+participant Alice
+participant Bob
+participant Carol
+
+Manager->Game: createDecentralizedGame
+note over Game:Created
+note over Game:BettingPhase
+
+Carol->Game:bet
+Alice->Game:bet
+Bob->Game:bet
+
+Bob->Game:beginVerification
+
+
+note over Game:VerificationPhase
+
+opt
+
+Bob->Game: verifyEncryptedNumber
+Carol->Game: verifyEncryptedNumber
+Alice->Game: verifyEncryptedNumber
+
+end
+
+note over Game:EvaluationPhase
+
+Alice->Game:endGame
+
+Game->Bob:transfer(winnerPrize)
+Game->Manager:transfer(managerFee)
+
+note over Game:Ended
+@enduml
