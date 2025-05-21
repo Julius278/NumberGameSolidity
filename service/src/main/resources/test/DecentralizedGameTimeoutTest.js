@@ -1,7 +1,7 @@
 const {ethers} = require("hardhat");
 const {expect} = require("chai");
 
-describe("Decentralized Game Test", () => {
+describe("Decentralized Game Timeout Test", () => {
 
     let factory, game;
     let gameManager, player1, player2, player3;
@@ -37,7 +37,8 @@ describe("Decentralized Game Test", () => {
     });
 
     it("Manager creates a new decentralized game", async () => {
-        await (await factory.connect(gameManager).createDecentralizedGame()).wait();
+        //workaround for overloading a function -> createDecentralizedGame
+        await (await factory.connect(gameManager)['createDecentralizedGame()']()).wait();
         let gameAddress = await factory.connect(player1).getLastDecentralizedGameAddress();
         game = await GameContract.attach(gameAddress);
 
@@ -134,7 +135,7 @@ describe("Decentralized Game Test", () => {
     });
 
     it("player1 verifies its chosenNumber 50 times", async () => {
-        for (let i = 0; i<49; i++){
+        for (let i = 0; i<99; i++){
             await game.connect(player1).verifyEncryptedNumber(player1chosenNumber, player1NumberPassword);
         }
     });

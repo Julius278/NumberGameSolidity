@@ -37,7 +37,8 @@ describe("Decentralized Game Test", () => {
     });
 
     it("Manager creates a new decentralized game", async () => {
-        await (await factory.connect(gameManager).createDecentralizedGame()).wait();
+        //workaround for overloading a function -> createDecentralizedGame
+        await (await factory.connect(gameManager)['createDecentralizedGame()']()).wait();
         let gameAddress = await factory.connect(player1).getLastDecentralizedGameAddress();
         game = await GameContract.attach(gameAddress);
 
@@ -145,7 +146,7 @@ describe("Decentralized Game Test", () => {
 
     it("player2 verifies its chosenNumber during verification phase", async () => {
         let call = game.connect(player2).verifyEncryptedNumber(player2chosenNumber, player2NumberPassword);
-        await expect(call).to.emit(game, "EvaluationPhaseStarted")
+        await expect(call).to.emit(game, "EvaluationPhaseStarted");
     });
 
     it("player1 ends the game by decrypting all bets and call endGame", async () => {
