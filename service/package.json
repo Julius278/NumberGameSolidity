@@ -1,0 +1,33 @@
+{
+  "name": "number-game-solidity",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "hardhat compile",
+    "test": "hardhat test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Julius278/NumberGameSolidity.git"
+  },
+  "private": true,
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "1.0.4",
+    "@nomiclabs/hardhat-ethers": "2.2.1",
+    "eth-crypto": "2.7.0",
+    "ethereumjs-wallet": "1.0.2",
+    "ethers": "5.0.0",
+    "hardhat": "2.12.1",
+    "hardhat-contract-sizer": "2.6.1"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "4.7.3",
+    "dotenv": "16.3.1",
+    "node-forge": "^1.3.1",
+    "solidity-coverage": "0.8.2",
+    "test-unit": "0.1.0",
+    "web3": "^4.16.0",
+    "web3-eth-contract": "^4.7.2"
+  }
+}

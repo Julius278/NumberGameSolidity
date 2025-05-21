@@ -7,6 +7,7 @@
 	<artifactId>number-game-solidity</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<description>Demo project for university assignment</description>
+	<packaging>pom</packaging>
 
 	<modules>
 		<module>service</module>
