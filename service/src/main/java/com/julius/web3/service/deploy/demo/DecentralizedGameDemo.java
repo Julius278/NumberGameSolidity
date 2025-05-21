@@ -22,13 +22,13 @@ public class DecentralizedGameDemo {
 	public static final Logger LOGGER = LoggerFactory.getLogger(DecentralizedGameDemo.class);
 	public static final String KEY_FILE_PATH = "./service/src/main/resources/keyfile.json";
 	public static final String KEY_FILE_PASSWORD = "password";
-	//public static final String EVM_NODE_ADDRESS = "https://rpc-amoy.polygon.technology/";
-	public static final String EVM_NODE_ADDRESS = "http://localhost:8545/";
+	//public static final String EVM_NODE_URL = "https://rpc-amoy.polygon.technology/";
+	public static final String EVM_NODE_URL = "http://localhost:8545/";
 
 	public static void main(String[] args) throws Exception {
 
 		// setup for general node query
-		final Web3j web3jConnection = Web3j.build(new HttpService(EVM_NODE_ADDRESS));
+		final Web3j web3jConnection = Web3j.build(new HttpService(EVM_NODE_URL));
 		//long chainID = Long.parseLong(web3jConnection.netVersion().send().getNetVersion());
 		long chainID = web3jConnection.ethChainId().send().getChainId().longValue();
 		LOGGER.info("connected node: {}", web3jConnection.web3ClientVersion().send().getWeb3ClientVersion());
@@ -67,7 +67,7 @@ public class DecentralizedGameDemo {
 		DecentralizedGame game = DecentralizedGame.load(gameAddress, web3jConnection, credentials, gasProvider);
 		LOGGER.info("loaded DecentralizedGame");
 		String manager = game.getManager().send();
-		LOGGER.info("manager '{}' successfully deployed the GameFactory and create a decentralized game", manager);
+		LOGGER.info("manager '{}' successfully deployed the GameFactory and created a decentralized game", manager);
 		/*List<ManagedGame.Bet> bets = game.getBets().send();
 		bets.forEach(bet -> System.out.println("bet " + bet.voter + ", " + bet.encryptedNumber));*/
 	}
