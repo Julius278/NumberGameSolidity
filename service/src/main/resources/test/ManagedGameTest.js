@@ -68,7 +68,7 @@ describe("Managed Game Test", () => {
 
     it("player2 tries to place a bet without serviceFee and fails", async () => {
         let call = game.connect(player2).bet("encryptedNumberString");
-        await expect(call).to.be.revertedWith("Bet cost is 0.000000001 ether");
+        await expect(call).to.be.revertedWith("Bet cost is 0.001 ether");
     });
 
     it("player1 places a bet", async () => {
@@ -78,7 +78,7 @@ describe("Managed Game Test", () => {
 
         const encryptedNumberString = encryptMessage(managerPublicKey, chosenNumber);
 
-        const options = {value: ethers.utils.parseEther("0.000000001")}
+        const options = {value: ethers.utils.parseEther("0.001")}
         await game.connect(player1).bet(encryptedNumberString, options);
 
         let bets = await game.connect(player1).getBets();
@@ -96,7 +96,7 @@ describe("Managed Game Test", () => {
         //const encryptedNumberString = await encryptChosenNumber(player2Crypt, chosenNumber, managerPublicKey);
         const encryptedNumberString = encryptMessage(managerPublicKey, chosenNumber);
 
-        const options = {value: ethers.utils.parseEther("0.000000001")}
+        const options = {value: ethers.utils.parseEther("0.001")}
         await game.connect(player2).bet(encryptedNumberString, options);
 
         let bets = await game.connect(player2).getBets();
@@ -113,7 +113,7 @@ describe("Managed Game Test", () => {
     });
 
     it("player2 tries to place a second bet and fails", async () => {
-        const options = {value: ethers.utils.parseEther("0.000000001")}
+        const options = {value: ethers.utils.parseEther("0.001")}
         let call = game.connect(player2).bet("encryptedNumberString", options);
         await expect(call).to.be.revertedWith("Vote already taken for this address");
     });
@@ -125,7 +125,7 @@ describe("Managed Game Test", () => {
 
         const encryptedNumberString = encryptMessage(managerPublicKey, chosenNumber);
 
-        const options = {value: ethers.utils.parseEther("0.000000001")}
+        const options = {value: ethers.utils.parseEther("0.001")}
         await game.connect(player3).bet(encryptedNumberString, options);
 
         let bets = await game.connect(player3).getBets();
