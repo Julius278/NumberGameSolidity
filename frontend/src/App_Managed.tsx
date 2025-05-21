@@ -77,24 +77,30 @@ function App() {
   }
 
   const handleConnect = async (providerWithInfo: EIP6963ProviderDetail) => {
-    try {
-      let prov = new ethers.BrowserProvider(providerWithInfo.provider);
-      setProvider(prov);
-
-      setSelectedWallet(providerWithInfo);
-
-      await initProvider(prov);
-
-      let signerInstance = await prov.getSigner()
-      
-      console.log(signerInstance.address)
-
-      await retrieveGames(signerInstance);
-    } catch (error) {
-      console.error(error)
-      const mmError: MMError = error as MMError
-      setError(`Code: ${mmError.code} \nError Message: ${mmError.message}`)
-    }
+      try {
+        let prov = new ethers.BrowserProvider(providerWithInfo.provider);
+        setProvider(prov);
+  
+        const accounts = await providerWithInfo.provider.request({
+          method: "eth_requestAccounts"
+        }) as string[]
+  
+        setSelectedWallet(providerWithInfo);
+        setUserAccount(accounts?.[0]);      
+  
+        const accountBalance = (await prov.getBalance(accounts?.[0]));
+        setBalance(ethers.formatEther(ethers.toBigInt(accountBalance)) + " ETH");
+  
+        let signerInstance = await prov.getSigner()
+        
+        console.log(signerInstance.address)
+  
+        await retrieveGames(signerInstance);
+      } catch (error) {
+        console.error(error)
+        const mmError: MMError = error as MMError
+        setError(`Code: ${mmError.code} \nError Message: ${mmError.message}`)
+      }
   }
 
  
@@ -300,16 +306,6 @@ function App() {
     if(gameState == GameState.Ended){
       checkWinnerState(gameContract);
     }
-  }
-
-  async function initProvider(provider: AbstractProvider) {
-    let prov = provider as BrowserProvider;
-    const accounts = (await prov.listAccounts()) as JsonRpcSigner[];
-    if(userAccount == "")
-      setUserAccount(accounts?.[0].address);
-
-    const accountBalance = (await prov.getBalance(accounts?.[0]));
-    setBalance(ethers.formatEther(ethers.toBigInt(accountBalance)) + " ETH");
   }
 
   async function checkWinnerState(gameContract: ethers.Contract) {
