@@ -14,6 +14,10 @@ alternatively you could play around on Polygon Amoy with the in the frontend pre
 * running EVM based blockchain node (e.g. Hyperledger Besu)
 
 ### setup
+* build the Maven project once from the projects root path
+``` bash
+mvn clean install
+``` 
 * open DecentralizedGameDemo.java and start the main method
   * alternatively execute the following bash command: 
 ``` bash
