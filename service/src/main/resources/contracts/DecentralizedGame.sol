@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity ^0.8.15;
+pragma solidity 0.8.15;
 
 import "hardhat/console.sol";
 
@@ -27,7 +27,6 @@ contract DecentralizedGame {
     }
 
     address private manager;
-    string private managerPublicKey;
     address payable[] private possibleWinnerList;
     address payable private winner;
     uint16[] private winnerBetList;
@@ -101,10 +100,6 @@ contract DecentralizedGame {
      */
     function getManager() external view returns (address) {
         return manager;
-    }
-
-    function getManagerPublicKey() external view returns (string memory) {
-        return managerPublicKey;
     }
 
     function bet(bytes32 _numberHash) external payable bettingPhase {
@@ -200,7 +195,7 @@ contract DecentralizedGame {
         uint average = (sum / bets.length) * 2 / 3;
         console.log("two third average is: %s", average);
 
-        uint lowestDiff;
+        uint lowestDiff = 1001;
 
         for (uint i = 0; i < bets.length; i++) {
             if (bets[i].verified) {
@@ -208,26 +203,19 @@ contract DecentralizedGame {
                 if (diff < 0) {
                     diff *= - 1;
                 }
-                if (i == 0) {
+                console.log("next checked bet is: '%s' from '%s', with a diff of '%s'", bets[i].verifiedChosenNumber, bets[i].player, uint(diff));
+                if (lowestDiff > uint(diff)) {
+                    delete possibleWinnerList;
+                    delete winnerBetList;
+                    console.log("old lowestDiff is: %s, new one is: %s, emptied winner and winnerBet arrays", lowestDiff, uint(diff));
                     lowestDiff = uint(diff);
                     possibleWinnerList.push(bets[i].player);
                     winnerBetList.push(bets[i].verifiedChosenNumber);
-                    console.log("first checked bet is: '%s' from '%s', with a diff of '%s'", bets[i].verifiedChosenNumber, bets[i].player, lowestDiff);
-                } else {
-                    console.log("next checked bet is: '%s' from '%s', with a diff of '%s'", bets[i].verifiedChosenNumber, bets[i].player, uint(diff));
-                    if (lowestDiff > uint(diff)) {
-                        delete possibleWinnerList;
-                        delete winnerBetList;
-                        console.log("old lowestDiff is: %s, new one is: %s, emptied winner and winnerBet arrays", lowestDiff, uint(diff));
-                        lowestDiff = uint(diff);
-                        possibleWinnerList.push(bets[i].player);
-                        winnerBetList.push(bets[i].verifiedChosenNumber);
-                    } else if (lowestDiff == uint(diff)) { //if diff is same, push
-                        console.log("same lowestDiff: %s as the current winner, push the new winner additionally to the winner array: '%s'", uint(diff), bets[i].player);
+                } else if (lowestDiff == uint(diff)) { //if diff is same, push
+                    console.log("same lowestDiff: %s as the current winner, push the new winner additionally to the winner array: '%s'", uint(diff), bets[i].player);
 
-                        possibleWinnerList.push(bets[i].player);
-                        winnerBetList.push(bets[i].verifiedChosenNumber);
-                    }
+                    possibleWinnerList.push(bets[i].player);
+                    winnerBetList.push(bets[i].verifiedChosenNumber);
                 }
             } else {
                 console.log("bet from %s is not verified", bets[i].player);
