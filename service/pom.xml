@@ -120,15 +120,15 @@
 							<outputDirectory>${basedir}/target/contracts</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${basedir}/node_modules/</directory>
-									<includes>
-										<include>hardhat/console.sol</include>
-									</includes>
-								</resource>
-								<resource>
 									<directory>${basedir}/src/main/resources/contracts/</directory>
 									<includes>
 										<include>*.sol</include>
+									</includes>
+								</resource>
+								<resource>
+									<directory>${basedir}/node_modules/</directory>
+									<includes>
+										<include>hardhat/console.sol</include>
 									</includes>
 								</resource>
 							</resources>
