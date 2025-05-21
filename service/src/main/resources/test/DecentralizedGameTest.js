@@ -1,8 +1,6 @@
 const {ethers} = require("hardhat");
 const {expect} = require("chai");
 
-const forge = require('node-forge');
-
 describe("Decentralized Game Test", () => {
 
     let factory, game;
