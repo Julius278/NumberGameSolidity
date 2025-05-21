@@ -17,7 +17,7 @@ contract GameFactory {
     }
 
     function createDecentralizedGame() public {
-        DecentralizedGame dGame = new DecentralizedGame(msg.sender);
+        DecentralizedGame dGame = new DecentralizedGame(msg.sender, 50);
         dGames.push(dGame);
     }
 
