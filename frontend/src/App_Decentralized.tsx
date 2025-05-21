@@ -32,9 +32,8 @@ function App() {
 
   const [selectedWallet, setSelectedWallet] = useState<EIP6963ProviderDetail>()
 
-  //TODO: get factoryAddress from e.g. environment variable
-  //const factoryAddress = "0x502c822daef6a0b6424a4d5573d2c35983c99b37";
-  const factoryAddress = "0x4e73d7f0573f946757aba44c098a0abcccb3e127"
+  //const factoryAddress = "0x502c822daef6a0b6424a4d5573d2c35983c99b37";  
+  const factoryAddress = import.meta.env.VITE_EVM_FACTORY_ADDRESS;
 
   const providers = useSyncProviders();
   const [userAccount, setUserAccount] = useState<string>("");
